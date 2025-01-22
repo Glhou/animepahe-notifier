@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  animepahe_service:
+    build: ./Services
+    volumes:
+      - ./Services:/app
+    networks:
+      - animepahe_network
+  docker_notifier:
+    image: ghcr.io/glhou/docker-telegram-notifier:latest
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - CHAT_ID=${CHAT_ID}
+    ports:
+      - "8081:8081"
+    networks:
+      - animepahe_network
+  localstack:
+    image: localstack/localstack
+    environment:
+      - SERVICES=s3
+    ports:
+      - "4566:4566"
+    volumnes:
+      - "./aws:etc/localstack/init/ready.d"
+    networks:
+      - animepahe_network
+
+networks:
+  default:
+    private: true
+    name: animepahe_network
