@@ -1,5 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 import json
 import boto3
 '''
@@ -25,11 +27,21 @@ Data format:
 def get_data():
     # get animepahe.ru
     url = "https://animepahe.com/api?m=airing&page=1"
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    driver = webdriver.Chrome(options=options)
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--headless")  # If you need headless mode
+    chrome_options.binary_location = "/usr/bin/google-chrome-stable"
+    
+    chrome_driver_path = ChromeDriverManager().install()
+
+    service = Service(chrome_driver_path)
+
+    driver = webdriver.Chrome(
+        service=service,
+        options=chrome_options
+    )
+
     driver.get(url)
     while driver.title == "DDoS-Guard":
         driver.implicitly_wait(1)
@@ -92,7 +104,10 @@ def handler(event, context):
             messages = build_messages(new_anime)
             send_messages(messages)
             write_last_sent_anime(new_anime)
-            return {"status": "success", "message": "Function executed successfully"}
+            print("Function executed successfully")
+            print(new_anime)
+            return {"status": "success", "message": "Function executed successfully", "new_anime": new_anime}
         return {"status": "Error", "message": "There were no data"}
     except Exception as e:
+        print(e)
         return {"status": "Error", "message": str(e)}

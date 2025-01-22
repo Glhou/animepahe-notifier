@@ -1,1 +1,3 @@
 selenium
+boto3
+webdriver_manager
