@@ -84,10 +84,15 @@ def send_messages(messages):
 
 
 def handler(event, context):
-    data = get_data()
-    if data:
-        last_anime = get_last_sent_anime()
-        new_anime = get_new_anime(data, last_anime)
-        messages = build_messages(new_anime)
-        send_messages(messages)
-        write_last_sent_anime(new_anime)
+    try:
+        data = get_data()
+        if data:
+            last_anime = get_last_sent_anime()
+            new_anime = get_new_anime(data, last_anime)
+            messages = build_messages(new_anime)
+            send_messages(messages)
+            write_last_sent_anime(new_anime)
+            return {"status": "success", "message": "Function executed successfully"}
+        return {"status": "Error", "message": "There were no data"}
+    except Exception as e:
+        return {"status": "Error", "message": str(e)}
