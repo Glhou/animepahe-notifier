@@ -83,7 +83,7 @@ def send_messages(messages):
     pass
 
 
-def handler():
+def handler(event, context):
     data = get_data()
     if data:
         last_anime = get_last_sent_anime()
