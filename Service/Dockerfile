@@ -25,6 +25,7 @@ RUN yum -y install \
     vulkan
 
 COPY ./chrome-installer.sh ./chrome-installer.sh
+RUN chmod +x ./chrome-installer.sh
 RUN ./chrome-installer.sh
 RUN rm ./chrome-installer.sh
 
