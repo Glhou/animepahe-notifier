@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.service import Service
 import json
 import boto3
 import os
+import urllib3
 '''
 Data format:
 {
@@ -72,9 +73,9 @@ def write_last_sent_anime(anime):
     # using s3 bucket write the last anime sent
     try:
         s3 = boto3.client('s3')
-        s3.put_object(Bucket='anime-notify', Key='last_anime', Body=anime)
-    except:
-        print('Error writing to s3')
+        s3.put_object(Bucket='anime-notify-bucket', Key='last_anime', Body=anime)
+    except Exception as e:
+        print(f'Error writing to s3 : {e}')
 
 
 def get_new_anime(data, last_anime):
@@ -98,7 +99,17 @@ def build_messages(data):
 
 
 def send_messages(messages):
-    pass
+    try:
+        ecs_service_dns_name = "telegram-notifier-service.my-ecs-service.local"
+        url = f"http://{ecs_service_dns_name}/send"
+        body = {"service": "animepahe-notifier", "level": "INFO", "message": "\n".join(messages)}
+        headers = {"Content-Type": "application/json"}
+        response = urllib3.PoolManager().request("POST", url, body=json.dumps(body), headers=headers)
+        if response.text == "Error: missing evironment variables":
+            raise Exception("Error: missing evironment variables")
+        print(response.text)
+    except Exception as e:
+        print(f"Error sending messages: {e}")
 
 
 def handler(event, context):
