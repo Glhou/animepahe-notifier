@@ -4,6 +4,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 import json
 import boto3
+import os
 '''
 Data format:
 {
@@ -23,6 +24,9 @@ Data format:
 }
 '''
 
+# Set the download location for ChromeDriver to /tmp
+os.environ["WDM_LOCAL"] = "/tmp"
+
 
 def get_data():
     # get animepahe.ru
@@ -32,7 +36,9 @@ def get_data():
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--headless")  # If you need headless mode
     chrome_options.binary_location = "/usr/bin/google-chrome-stable"
-    
+    # check if the binary exists
+    if not os.path.exists(chrome_options.binary_location):
+        raise FileNotFoundError(f"Chrome binary not found at {chrome_options.binary_location}")
     chrome_driver_path = ChromeDriverManager().install()
 
     service = Service(chrome_driver_path)
@@ -55,7 +61,7 @@ def get_last_sent_anime():
     # using s3 bucket get the last anime sent
     try:
         s3 = boto3.client('s3')
-        response = s3.get_object(Bucket='anime-notify', Key='last_anime')
+        response = s3.get_object(Bucket='anime-notify-bucket', Key='last_anime')
         anime = response['Body'].read().decode('utf-8')
     except:
         anime = None
