@@ -35,13 +35,13 @@ def get_data():
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--headless")  # If you need headless mode
-    chrome_options.binary_location = "/usr/bin/google-chrome-stable"
+    chrome_options.binary_location = "/opt/chrome/chrome-linux64/chrome"
     # check if the binary exists
     if not os.path.exists(chrome_options.binary_location):
         raise FileNotFoundError(f"Chrome binary not found at {chrome_options.binary_location}")
-    chrome_driver_path = ChromeDriverManager().install()
+    #chrome_driver_path = ChromeDriverManager().install()
 
-    service = Service(chrome_driver_path)
+    service = Service("/opt/chrome-driver/chromedriver-linux64/chromedriver", log_path="/tmp/chromedriver.log")
 
     driver = webdriver.Chrome(
         service=service,

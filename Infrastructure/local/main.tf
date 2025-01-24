@@ -99,6 +99,8 @@ resource "aws_lambda_function" "anime-notify-lambda" {
   package_type  = "Image"
   image_uri     = "ghcr.io/glhou/animepahe-notifier:main"
   role          = aws_iam_role.iam_for_lambda.arn
+  timeout       = 900
+  memory_size   = 512
 }
 
 ### ECS

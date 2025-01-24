@@ -1,31 +1,13 @@
 # Use the official Python image from the Docker Hub
-FROM  public.ecr.aws/lambda/python:3.9
+FROM  public.ecr.aws/lambda/python:3.12
 
-# Install necessary dependencies for Chrome and Chromedriver
-RUN yum -y groupinstall "Development Tools"
-RUN yum -y install \
-    wget \
-    unzip \
-    curl \
-    alsa-lib \
-    atk \
-    cups-libs \
-    gtk3 \
-    nss \
-    libX11.x86_64 \
-    libXcomposite.x86_64 \
-    libXdamage.x86_64 \
-    libXtst.x86_64 \
-    fontconfig \
-    freetype \
-    xorg-x11-server-Xvfb \
-    liberation-fonts \
-    libvulkan \
-    xdg-utils \
-    vulkan
+# install chrome dependencies
+RUN dnf install -y atk cups-libs gtk3 libXcomposite alsa-lib \
+    libXcursor libXdamage libXext libXi libXrandr libXScrnSaver \
+    libXtst pango at-spi2-atk libXt xorg-x11-server-Xvfb \
+    xorg-x11-xauth dbus-glib dbus-glib-devel nss mesa-libgbm jq unzip
 
 COPY ./chrome-installer.sh ./chrome-installer.sh
-RUN chmod +x ./chrome-installer.sh
 RUN ./chrome-installer.sh
 RUN rm ./chrome-installer.sh
 

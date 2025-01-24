@@ -1,19 +1,22 @@
 #!/bin/bash
 set -e
 
-# Download Chromium package
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+latest_stable_json="https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json"
+# Retrieve the JSON data using curl
+json_data=$(curl -s "$latest_stable_json")
 
-# Install it
-rpm -i google-chrome-stable_current_x86_64.rpm
+latest_chrome_linux_download_url="$(echo "$json_data" | jq -r ".channels.Stable.downloads.chrome[0].url")"
+latest_chrome_driver_linux_download_url="$(echo "$json_data" | jq -r ".channels.Stable.downloads.chromedriver[0].url")"
 
-# Download the chromedriver version matching your Chromium version
-wget https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
+download_path_chrome_linux="/opt/chrome-headless-shell-linux.zip"
+dowload_path_chrome_driver_linux="/opt/chrome-driver-linux.zip"
 
-# Unzip the downloaded file
-unzip chromedriver_linux64.zip
+mkdir -p "/opt/chrome"
+curl -Lo $download_path_chrome_linux $latest_chrome_linux_download_url
+unzip -q $download_path_chrome_linux -d "/opt/chrome"
+rm -rf $download_path_chrome_linux
 
-# Move chromedriver to a suitable directory
-mv chromedriver /usr/local/bin/
-
-export CHROME_BIN=/usr/bin/google-chrome-stable
+mkdir -p "/opt/chrome-driver"
+curl -Lo $dowload_path_chrome_driver_linux $latest_chrome_driver_linux_download_url
+unzip -q $dowload_path_chrome_driver_linux -d "/opt/chrome-driver"
+rm -rf $dowload_path_chrome_driver_linux
