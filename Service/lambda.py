@@ -73,7 +73,8 @@ def write_last_sent_anime(anime):
     # using s3 bucket write the last anime sent
     try:
         s3 = boto3.client('s3')
-        s3.put_object(Bucket='anime-notify-bucket', Key='last_anime', Body=anime.encode('utf-8'))
+        if anime:
+            s3.put_object(Bucket='anime-notify-bucket', Key='last_anime', Body=anime[0].encode('utf-8'))
     except Exception as e:
         print(f'Error writing to s3 : {e}')
 
@@ -100,7 +101,7 @@ def build_messages(data):
 
 def send_messages(messages):
     try:
-        ecs_service_dns_name = "telegram-notifier-service.my-ecs-service.local"
+        ecs_service_dns_name = os.environ.get("ECS_SERVICE_DNS_NAME")
         url = f"http://{ecs_service_dns_name}:8081/send"
         body = {"service": "animepahe-notifier", "level": "INFO", "message": "\n".join(messages)}
         headers = {"Content-Type": "application/json"}
