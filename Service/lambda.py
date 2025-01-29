@@ -106,9 +106,12 @@ def send_messages(messages):
         body = {"service": "animepahe-notifier", "level": "INFO", "message": "\n".join(messages)}
         headers = {"Content-Type": "application/json"}
         response = urllib3.PoolManager().request("POST", url, body=json.dumps(body), headers=headers)
-        if response.text == "Error: missing evironment variables":
+        if response.read() == "Error: missing evironment variables":
             raise Exception("Error: missing evironment variables")
-        print(response.text)
+        print(response.status)
+        print(response.data)
+        print(response.json())
+        print(response.read())
     except Exception as e:
         print(f"Error sending messages: {e}")
 
