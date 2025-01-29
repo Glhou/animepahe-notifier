@@ -74,7 +74,7 @@ def write_last_sent_anime(anime):
     try:
         s3 = boto3.client('s3')
         if anime:
-            s3.put_object(Bucket='anime-notify-bucket', Key='last_anime', Body=anime[0].encode('utf-8'))
+            s3.put_object(Bucket='anime-notify-bucket', Key='last_anime', Body=json.dumps(anime[0]))
     except Exception as e:
         print(f'Error writing to s3 : {e}')
 
@@ -102,7 +102,7 @@ def build_messages(data):
 def send_messages(messages):
     try:
         ecs_service_dns_name = os.environ.get("ECS_SERVICE_DNS_NAME")
-        url = f"http://{ecs_service_dns_name}:8081/send"
+        url = f"http://{ecs_service_dns_name}/send"
         body = {"service": "animepahe-notifier", "level": "INFO", "message": "\n".join(messages)}
         headers = {"Content-Type": "application/json"}
         response = urllib3.PoolManager().request("POST", url, body=json.dumps(body), headers=headers)
