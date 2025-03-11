@@ -96,7 +96,7 @@ def build_messages(data):
     for anime in data:
         message = f"New episode of {anime['anime_title']} is out!\nEpisode: {anime['episode']}\nSnapshot: {anime['snapshot']}\nCreated at: {anime['created_at']}\nCompleted: {anime['completed']}\n"
         messages.append(message)
-    return messagesead()
+    return messages
 
 
 def send_messages(messages):
@@ -106,9 +106,9 @@ def send_messages(messages):
         body = {"service": "animepahe-notifier", "level": "INFO", "message": "\n".join(messages)}
         headers = {"Content-Type": "application/json"}
         response = urllib3.PoolManager().request("POST", url, body=json.dumps(body), headers=headers)
+        print(response.status)
         if response.status != "200":
             raise Exception("Error: missing evironment variables")
-        print(response.status)
     except Exception as e:
         print(f"Error sending messages: {e}")
 
@@ -117,9 +117,9 @@ def check_telegram_bot_status():
         ecs_service_dns_name = os.environ.get("ECS_SERVICE_DNS_NAME")
         url = f"https://{ecs_service_dns_name}/"
         response = urllib3.PoolManager().request("GET", url)
+        print(response.status)
         if response.status != "200":
             raise Exception("Error: cannot reach telegram bot")
-        print(response.status)
     except Exception as e:
         print(f"Error checking telegram bot status: {e}")
 
