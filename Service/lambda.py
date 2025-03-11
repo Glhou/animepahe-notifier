@@ -102,7 +102,7 @@ def build_messages(data):
 def send_messages(messages):
     try:
         ecs_service_dns_name = os.environ.get("ECS_SERVICE_DNS_NAME")
-        url = f"https://{ecs_service_dns_name}/send"
+        url = f"http://{ecs_service_dns_name}/send"
         body = {"service": "animepahe-notifier", "level": "INFO", "message": "\n".join(messages)}
         headers = {"Content-Type": "application/json"}
         response = urllib3.PoolManager().request("POST", url, body=json.dumps(body), headers=headers)
@@ -115,7 +115,7 @@ def send_messages(messages):
 def check_telegram_bot_status():
     try:
         ecs_service_dns_name = os.environ.get("ECS_SERVICE_DNS_NAME")
-        url = f"https://{ecs_service_dns_name}/"
+        url = f"http://{ecs_service_dns_name}/"
         response = urllib3.PoolManager().request("GET", url)
         print(response.status)
         if response.status != "200":
