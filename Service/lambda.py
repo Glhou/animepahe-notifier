@@ -112,9 +112,20 @@ def send_messages(messages):
     except Exception as e:
         print(f"Error sending messages: {e}")
 
+def check_telegram_bot_status():
+    try:
+        ecs_service_dns_name = os.environ.get("ECS_SERVICE_DNS_NAME")
+        url = f"https://{ecs_service_dns_name}/"
+        response = urllib3.PoolManager().request("GET", url)
+        if response.status != "200":
+            raise Exception("Error: cannot reach telegram bot")
+        print(response.status)
+    except Exception as e:
+        print(f"Error checking telegram bot status: {e}")
 
 def handler(event, context):
     try:
+        check_telegram_bot_status()
         data = get_data()
         if data:
             last_anime = get_last_sent_anime()
